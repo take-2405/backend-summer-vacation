@@ -1,7 +1,9 @@
 package controller
 
-import(
+import (
 	"log"
+	"strconv"
+	"time"
 
 	// import gin library
 	"github.com/gin-gonic/gin"
@@ -12,6 +14,9 @@ import(
 
 var(
 	user model.User
+	task1 model.Task1
+	task2 model.Task2
+	task2res model.Task2Response
 )
 
 type Controller struct {
@@ -46,6 +51,14 @@ func (ctrl *Controller)SayHello(context *gin.Context) {
 //   }
 // }
 func (ctrl *Controller)Task1(context *gin.Context) {
+	time := time.Now()
+	const layout1 = "2006-01-02"
+	const layout2 = "15:04:05"
+	task1.Timestamp=time.String()
+	task1.Detail.Time=time.Format(layout1)
+	task1.Detail.Date=time.Format(layout2)
+	context.JSON(200,model.Task1{task1.Timestamp,task1.Detail} )
+	return
 }
 
 // 課題2
@@ -64,6 +77,44 @@ func (ctrl *Controller)Task1(context *gin.Context) {
 //   "week": string //例： Monday
 // }
 func (ctrl *Controller)Task2(context *gin.Context) {
+	err := context.BindJSON(&task2)
+	if err != nil {
+		log.Println("[ERROR] Faild Bind JSON")
+		context.JSON(500, gin.H{"message": "Internal Server Error"})
+		return
+	}
+	year, _ := strconv.Atoi(task2.Year)
+	month, _ := strconv.Atoi(task2.Month)
+	day, _ := strconv.Atoi(task2.Day)
+	task2res.Week=DistinguishDaysOfWeek(calcDaysOfWeek(year,month,day))
+	context.JSON(200, model.Task2Response{task2res.Week})
+}
+
+func calcDaysOfWeek(year,month,day int)int{
+	var numDaysOfWeek int
+	//y + [ y / 4 ] - [ y / 100 ] + [ y / 400 ] + [ 153 ( m + 1 ) / 5 ] + 6 + d )　mod　7
+	numDaysOfWeek=(year+(year/4)-(year/100)+(year/400)+(13*month+8)/5+day)%7
+	return numDaysOfWeek
+}
+
+func DistinguishDaysOfWeek(numDaysOfWeek int)string{
+	switch numDaysOfWeek{
+	case 0:
+		return "Sunday"
+	case 1:
+		return "Monday"
+	case 2:
+		return "TuesDay"
+	case 3:
+		return "Wednesday"
+	case 4:
+		return "Thursday"
+	case 5:
+		return "Friday"
+	case 6:
+		return "Saturday"
+	}
+	return ""
 }
 
 // 課題3

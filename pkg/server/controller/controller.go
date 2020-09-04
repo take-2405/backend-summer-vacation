@@ -2,7 +2,6 @@ package controller
 
 import (
 	"log"
-	"strconv"
 	"time"
 
 	// import gin library
@@ -77,22 +76,18 @@ func (ctrl *Controller)Task1(context *gin.Context) {
 //   "week": string //例： Monday
 // }
 func (ctrl *Controller)Task2(context *gin.Context) {
-	err := context.BindJSON(&task2)
+	err := context.ShouldBindJSON(&task2)
 	if err != nil {
 		log.Println("[ERROR] Faild Bind JSON")
 		context.JSON(500, gin.H{"message": "Internal Server Error"})
 		return
 	}
-	year, _ := strconv.Atoi(task2.Year)
-	month, _ := strconv.Atoi(task2.Month)
-	day, _ := strconv.Atoi(task2.Day)
-	task2res.Week=DistinguishDaysOfWeek(calcDaysOfWeek(year,month,day))
+	task2res.Week=DistinguishDaysOfWeek(calcDaysOfWeek(task2.Year,task2.Month,task2.Day))
 	context.JSON(200, model.Task2Response{task2res.Week})
 }
 
 func calcDaysOfWeek(year,month,day int)int{
 	var numDaysOfWeek int
-	//y + [ y / 4 ] - [ y / 100 ] + [ y / 400 ] + [ 153 ( m + 1 ) / 5 ] + 6 + d )　mod　7
 	numDaysOfWeek=(year+(year/4)-(year/100)+(year/400)+(13*month+8)/5+day)%7
 	return numDaysOfWeek
 }

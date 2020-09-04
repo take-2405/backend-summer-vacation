@@ -15,9 +15,9 @@ type Task1detail struct {
 }
 
 type Task2 struct {
-	Year string`json:"year"`
-	Month string `json:"month""`
-	Day string `json:"day"`
+	Year int`json:"year"`
+	Month int `json:"month""`
+	Day int `json:"day"`
 }
 type Task2Response struct {
 	Week string `json:"week"`

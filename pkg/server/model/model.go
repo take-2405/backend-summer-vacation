@@ -31,7 +31,7 @@ type SignUp struct{
 }
 
 func InsertSignUpData(id , hashPass string)error{
-	stmt, err := db.Conn.Prepare("INSERT INTO signup VALUES (?,?)")
+	stmt, err := db.Conn.Prepare("INSERT INTO signUp VALUES (?,?)")
 	if err != nil {
 		return err
 	}

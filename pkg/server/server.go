@@ -20,7 +20,7 @@ func setupRooter(ctrl controller.Controller) *gin.Engine {
 	// 以下， 課題の進行状況に応じてコメントアウトを外す
 	router.GET("/task1", ctrl.Task1)
 	router.POST("/task2", ctrl.Task2)
-	// router.POST("/task4", ctrl.SignUp)
+	router.POST("/task3", ctrl.SignUp)
 	// router.POST("/task4", ctrl.SignIn)
 	return router
 }

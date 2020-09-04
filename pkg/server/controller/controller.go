@@ -2,8 +2,10 @@ package controller
 
 import (
 	"log"
+	"net/http"
 	"time"
-
+	"crypto/sha256"
+	//"golang.org/x/crypto/bcrypt"
 	// import gin library
 	"github.com/gin-gonic/gin"
 
@@ -16,6 +18,7 @@ var(
 	task1 model.Task1
 	task2 model.Task2
 	task2res model.Task2Response
+	signUp model.SignUp
 )
 
 type Controller struct {
@@ -128,6 +131,20 @@ func DistinguishDaysOfWeek(numDaysOfWeek int)string{
 //   "token": string
 // }
 func (ctrl *Controller)SignUp(context *gin.Context) {
+	if err := context.BindJSON(&signUp) ; err != nil {
+		log.Println("[ERROR] Faild Bind JSON")
+		context.JSON(500, gin.H{"message": "Internal Server Error"})
+		return
+	}
+	pass := []byte(signUp.Passeord)
+	hashed:= sha256.Sum256(pass)
+	log.Println(string(hashed[0]))
+	if err :=model.InsertSignUpData(signUp.Id,"");err!=nil{
+		log.Println(err)
+		context.JSON(http.StatusInternalServerError, "Internal Server Error")
+		return
+	}
+	context.JSON(200, "")
 }
 
 // 課題4

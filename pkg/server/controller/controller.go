@@ -3,12 +3,12 @@ package controller
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/miraikeitai2020/backend-summer-vacation/pkg/server/view"
 	"log"
 	"net/http"
 	"time"
-	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 
 	// import sample API packages
 	"github.com/miraikeitai2020/backend-summer-vacation/pkg/server/model"
@@ -174,4 +174,27 @@ func (ctrl *Controller)SignUp(context *gin.Context) {
 //   "certification": boolean
 // }
 func (ctrl *Controller)SignIn(context *gin.Context) {
+	if err := context.BindJSON(&signUp) ; err != nil {
+		log.Println("[ERROR] Faild Bind JSON")
+		context.JSON(500, gin.H{"message": "Internal Server Error"})
+		return
+	}
+	hashed:= sha256.Sum256([]byte(signUp.Password))
+	signUp.Password=hex.EncodeToString(hashed[:])
+	signIn,err :=model.SelectSignUpData(signUp.Id);
+	if err!=nil{
+		log.Println(err)
+		context.JSON(http.StatusInternalServerError, "Internal Server Error")
+		return
+	}
+
+	if signIn==nil{
+		log.Println(err)
+		context.JSON(http.StatusInternalServerError, gin.H{"certification": "false"})
+	}
+	if(signUp.Id != signIn.Id || signUp.Password!=signIn.Password){
+		context.JSON(http.StatusInternalServerError, gin.H{"certification": "false"})
+		return
+	}
+	context.JSON(200,gin.H{"certification": "true"} )
 }

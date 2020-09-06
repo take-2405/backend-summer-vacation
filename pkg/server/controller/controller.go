@@ -1,13 +1,14 @@
 package controller
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
+	"github.com/miraikeitai2020/backend-summer-vacation/pkg/server/view"
 	"log"
 	"net/http"
 	"time"
-	"crypto/sha256"
-	//"golang.org/x/crypto/bcrypt"
-	// import gin library
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 
 	// import sample API packages
 	"github.com/miraikeitai2020/backend-summer-vacation/pkg/server/model"
@@ -19,6 +20,7 @@ var(
 	task2 model.Task2
 	task2res model.Task2Response
 	signUp model.SignUp
+	viewSignUp view.SignUp
 )
 
 type Controller struct {
@@ -136,15 +138,24 @@ func (ctrl *Controller)SignUp(context *gin.Context) {
 		context.JSON(500, gin.H{"message": "Internal Server Error"})
 		return
 	}
-	pass := []byte(signUp.Passeord)
-	hashed:= sha256.Sum256(pass)
-	log.Println(string(hashed[0]))
-	if err :=model.InsertSignUpData(signUp.Id,"");err!=nil{
+
+	hashed:= sha256.Sum256([]byte(signUp.Password))
+
+	// UUIDで認証トークンを生成する
+	uuid, err := uuid.NewRandom()
+	if err != nil {
+		log.Println(err)
+		context.JSON(http.StatusInternalServerError, "AuthToken is error")
+		return
+	}
+	viewSignUp.Token=uuid.String()
+
+	if err :=model.InsertSignUpData(signUp.Id,hex.EncodeToString(hashed[:]),viewSignUp.Token);err!=nil{
 		log.Println(err)
 		context.JSON(http.StatusInternalServerError, "Internal Server Error")
 		return
 	}
-	context.JSON(200, "")
+	context.JSON(200, viewSignUp)
 }
 
 // 課題4

@@ -1,6 +1,8 @@
 package model
 
-import "github.com/miraikeitai2020/backend-summer-vacation/pkg/db"
+import (
+	"github.com/miraikeitai2020/backend-summer-vacation/pkg/db"
+)
 
 type User struct {
 	Name	string `json:"name"`
@@ -27,14 +29,15 @@ type Task2Response struct {
 
 type SignUp struct{
 	Id string `json:id`
-	Passeord string `json:password`
+	Password string `json:password`
 }
 
-func InsertSignUpData(id , hashPass string)error{
-	stmt, err := db.Conn.Prepare("INSERT INTO signUp VALUES (?,?)")
+func InsertSignUpData(id,hashPass,token string)error{
+	stmt, err := db.Conn.Prepare("INSERT INTO signUp VALUES (?,?,?)")
 	if err != nil {
 		return err
 	}
-	_, err = stmt.Exec(id,hashPass)
+	//fmt.Println(fmt.Sprintf("%s", hashPass))
+	_, err = stmt.Exec(id,hashPass,token)
 	return err
 }

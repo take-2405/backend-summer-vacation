@@ -14,8 +14,11 @@ services:
             - 'db'
     db:
         image: mysql:5.7
+        restart: always
         ports:
             - 3306:3306
+        volumes:
+            - ./db/mysql/init:/docker-entrypoint-initdb.d
         environment:
             MYSQL_ROOT_PASSWORD: 'miraiketai2020_admin'
             MYSQL_DATABASE: 'summer'

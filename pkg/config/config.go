@@ -50,6 +50,7 @@ func GetConnectionToken() string {
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	//fmt.Sprintf(accessTokenTemplate, c.User, c.Pass, c.IP, c.Port, c.Name)
+	//fmt.Println(accessTokenTemplate)
 	return fmt.Sprintf(accessTokenTemplate, c.User, c.Pass, c.IP, c.Port, c.Name)
 }
